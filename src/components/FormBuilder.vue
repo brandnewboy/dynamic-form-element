@@ -2,6 +2,16 @@
 import { ElInput, ElForm, ElFormItem, ElCol, ElRow } from 'element-plus'
 import {type VNode, useTemplateRef, computed, type Component} from 'vue'
 
+/**
+ * 动态表单构建器要点
+ * 1. 动态组件component渲染，属性与element-plus组件保持一致
+ * 2. type控制组件类型，可以是字符串(预定义)、函数返回VNode、组件
+ * 3. 插槽渲染，支持自定义插槽
+ * 4. 控制隐藏显示等特殊处理，v-for与v-if同时使用出问题，提前使用computed过滤数据
+ * 5. 控制表单项排列，span控制宽度，使用栅格布局
+ * 6. 属性透传
+ */
+
 const props = defineProps<{
   formItems: IFormItem[]
   formData: Record<string, any>

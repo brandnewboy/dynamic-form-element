@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FormBuilder, { type IFormItem } from "./components/FormBuilder.vue"
 import {ref, h, useTemplateRef, computed} from "vue"
-import {ElInput, ElInputNumber, ElButton, ElSelect, ElRadioGroup, ElCascader} from "element-plus"
+import {ElInput, ElInputNumber, ElButton, ElSelect, ElRadioGroup, ElCascader, ElMessage} from "element-plus"
 import HelloWorld from './components/HelloWorld.vue'
 import {testCascadeOptions} from "./store";
 import {useFormBuilder} from "./composables/useFormBuilder.ts";
@@ -115,7 +115,15 @@ const formItems = computed<IFormItem[]>(() => [
       props: {
         options: testCascadeOptions,
       }
+    },
+  {
+    type: () => h(ElButton, { type: 'primary' }, { default: () => '按钮测试' }),
+    label: '按钮测试',
+    prop: 'submit',
+    onClick: () => {
+      ElMessage.success('按钮测试')
     }
+  }
   ])
 
 const formBuilderRef = useTemplateRef<typeof FormBuilder>('formBuilderRef')
@@ -161,11 +169,7 @@ const onSubmitComposable = () => {
 
   <div class="form-container">
     <h1>组合式函数使用</h1>
-    <FormBuilderComposable
-        :formRules="formRules"
-        :formItems="formItems"
-        :formData="formData"
-    >
+    <FormBuilderComposable>
       <template #customSlotValue>
         <el-input v-model="formData.customSlotValue" placeholder="请输入自定义插槽的值" />
       </template>
