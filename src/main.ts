@@ -1,6 +1,12 @@
 import { createApp } from 'vue'
-// import './style.css'
-import 'element-plus/dist/index.css'
-import App from './App.vue'
+import { ElLoading } from 'element-plus'
 
-createApp(App).mount('#app')
+import 'element-plus/dist/index.css'
+
+import App from './App.vue'
+import { router } from './router'
+
+createApp(App)
+  .directive('loading', ElLoading.directive)
+  .use(router)
+  .mount('#app')

@@ -9,8 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/node": "^24.5.2",
     "element-plus": "^2.11.2",
-    "vue": "^3.5.18"
+    "prettier": "^3.6.2",
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
