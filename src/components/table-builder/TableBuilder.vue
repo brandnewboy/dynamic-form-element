@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import {
   ElRow,
   ElCol,
@@ -7,8 +7,14 @@ import {
   ElTableColumn,
   ElButton,
   ElInput,
+  ElNotification,
+  ElMessageBox,
 } from 'element-plus'
 import { renderDialog } from '@/renderDialog'
+import TableForm, {
+  type ITableFormProps,
+} from '@/components/table-builder/TableForm.vue'
+import type { IFormItem } from '@/components/FormBuilder.vue'
 
 interface Column {
   prop: string
@@ -25,6 +31,9 @@ interface DataApis {
 const props = defineProps<{
   dataApis: DataApis
   columns: Column[]
+  rowKey?: string
+  formItems: IFormItem[]
+  formRules: Record<string, any>
 }>()
 export type { Column, DataApis }
 
@@ -44,22 +53,96 @@ function loadData() {
     })
 }
 onMounted(loadData)
-// TODO 完善
-const Comp = () => {
-  return h('h1', 'hello dialog')
+const selectRows = ref<any[]>([])
+const selectRow = computed(() => {
+  return selectRows.value[0]
+})
+const handleSelectionChange = (val: any[]) => {
+  console.log('handleSelectionChange', val)
+  selectRows.value = val
 }
 
 function openForm(data: Record<string, any>) {
-  renderDialog(Comp, {}, {})
+  renderDialog<typeof TableForm, ITableFormProps>(
+    TableForm,
+    {
+      formItems: props.formItems,
+      formData: data,
+      formRules: props.formRules,
+      requestApi: data[props.rowKey || 'id']
+        ? props.dataApis.update
+        : props.dataApis.create,
+    },
+    {
+      title: data[props.rowKey || 'id'] ? '修改' : '新增',
+      onConfirm: () => {
+        loadData()
+      },
+    },
+  )
 }
 
 async function handleCreate() {
   openForm({})
 }
 function handleUpdate() {
-  openForm({})
+  if (!selectRow.value) {
+    ElNotification({
+      title: '提示',
+      type: 'error',
+      message: '请选择要修改的行',
+    })
+    return
+  }
+  openForm(selectRow.value)
 }
-function handleRemove() {}
+function handleRemove() {
+  if (!selectRow.value) {
+    ElNotification({
+      title: '提示',
+      type: 'warning',
+      message: '请选择要删除的行',
+    })
+    return
+  }
+  ElMessageBox.confirm('确定删除选中行吗？', '提示', {
+    confirmButtonText: '确认删除',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      props.dataApis
+        .remove?.(selectRows.value.map(item => item[props.rowKey || 'id']))
+        .then(() => {
+          loadData()
+          ElNotification({
+            title: '提示',
+            type: 'success',
+            message: '删除成功',
+          })
+        })
+        .catch(() => {
+          ElNotification({
+            title: '提示',
+            type: 'error',
+            message: '删除失败',
+          })
+        })
+    })
+    .catch(() => {
+      ElNotification({
+        title: '提示',
+        type: 'primary',
+        message: '取消操作',
+      })
+    })
+}
+
+defineExpose({
+  refresh() {
+    loadData()
+  },
+})
 </script>
 
 <template>
@@ -70,13 +153,23 @@ function handleRemove() {}
         <el-button type="primary" @click="handleCreate">新增</el-button>
         <el-button type="danger" @click="handleRemove">删除</el-button>
       </el-col>
-      <el-col :span="6">
-        <el-input placeholder="请输入搜索内容" />
+      <el-col :span="5">
+        <el-input v-model="queryParams.keyword" placeholder="请输入搜索内容" />
+      </el-col>
+      <el-col :span="2">
+        <el-button type="primary" @click="loadData">搜索</el-button>
       </el-col>
     </el-row>
     <el-row>
       <el-col>
-        <el-table v-loading="isLoading" :data="tableData" v-bind="$attrs">
+        <el-table
+          v-loading="isLoading"
+          :data="tableData"
+          v-bind="$attrs"
+          :row-key="rowKey"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column type="selection" width="55" />
           <el-table-column
             v-for="item in columns"
             :key="item.prop"

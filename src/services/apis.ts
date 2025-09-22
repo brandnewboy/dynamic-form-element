@@ -1,31 +1,41 @@
 import type { DataApis } from '@/components/table-builder/TableBuilder.vue'
 
 export interface UserDto {
+  id: number
   date: string
   name: string
   address: string
+  phone: string
 }
 
 let dataSource: UserDto[] = [
   {
+    id: 1,
     date: '2016-05-03',
     name: 'Tom',
     address: 'No. 189, Grove St, Los Angeles',
+    phone: '13800000000',
   },
   {
+    id: 2,
     date: '2016-05-02',
     name: 'Tom',
     address: 'No. 189, Grove St, Los Angeles',
+    phone: '13800000000',
   },
   {
+    id: 3,
     date: '2016-05-04',
     name: 'Tom',
     address: 'No. 189, Grove St, Los Angeles',
+    phone: '13800000000',
   },
   {
+    id: 4,
     date: '2016-05-01',
     name: 'Tom',
     address: 'No. 189, Grove St, Los Angeles',
+    phone: '13800000000',
   },
 ]
 
@@ -48,6 +58,7 @@ export const apis: DataApis = {
   create: async (data: any) => {
     await promiseTimeout(500) // 模拟网络延迟
     data.id = dataSource.length + 1
+    data.date = new Date().toLocaleDateString()
     dataSource.push(data)
     console.log('create', dataSource)
 
