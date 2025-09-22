@@ -58,7 +58,6 @@ const selectRow = computed(() => {
   return selectRows.value[0]
 })
 const handleSelectionChange = (val: any[]) => {
-  console.log('handleSelectionChange', val)
   selectRows.value = val
 }
 
