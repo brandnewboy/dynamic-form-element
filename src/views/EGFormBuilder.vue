@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import FormBuilder, { type IFormItem } from "@/components/FormBuilder.vue"
-import {ref, h, useTemplateRef, computed} from "vue"
-import {ElInput, ElInputNumber, ElButton, ElSelect, ElRadioGroup, ElCascader, ElMessage} from "element-plus"
+import FormBuilder, { type IFormItem } from '@/components/FormBuilder.vue'
+import { ref, h, useTemplateRef, computed } from 'vue'
+import {
+  ElInput,
+  ElInputNumber,
+  ElButton,
+  ElSelect,
+  ElRadioGroup,
+  ElCascader,
+  ElMessage,
+} from 'element-plus'
 import HelloWorld from '@/components/HelloWorld.vue'
-import {testCascadeOptions} from "@/store";
-import {useFormBuilder} from "@/composables/useFormBuilder.ts";
+import { testCascadeOptions } from '@/store'
+import { useFormBuilder } from '@/composables/useFormBuilder.ts'
 
 const formData = ref({
   name: '',
@@ -14,23 +22,17 @@ const formData = ref({
   customComponentValue: '自定义组件值',
   hFunctionValue: '渲染函数值',
   customSlotValue: '',
-  relationsConditionValue: undefined
+  relationsConditionValue: undefined,
 })
 
 const formRules = ref({
-  name: [
-    { required: true, message: '请输入姓名', trigger: 'blur' },
-  ],
+  name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
   age: [
     { required: true, message: '请输入年龄', trigger: 'blur' },
     { type: 'number', message: '请输入数字', trigger: 'blur' },
   ],
-  gender: [
-    { required: true, message: '请选择性别', trigger: 'change' },
-  ],
-  status: [
-    { required: true, message: '请选择状态', trigger: 'change' },
-  ],
+  gender: [{ required: true, message: '请选择性别', trigger: 'change' }],
+  status: [{ required: true, message: '请选择状态', trigger: 'change' }],
   customSlotValue: [
     { required: true, message: '请输入自定义插槽的值', trigger: 'blur' },
   ],
@@ -56,7 +58,7 @@ const formItems = computed<IFormItem[]>(() => [
     placeholder: '请输入年龄',
     props: {
       type: 'number',
-    }
+    },
   },
   {
     type: ElRadioGroup,
@@ -72,7 +74,7 @@ const formItems = computed<IFormItem[]>(() => [
         label: '禁用',
         value: 2,
       },
-    ]
+    ],
   },
   {
     type: ElSelect,
@@ -88,7 +90,7 @@ const formItems = computed<IFormItem[]>(() => [
         label: '女',
         value: 2,
       },
-    ]
+    ],
   },
   {
     type: HelloWorld,
@@ -114,7 +116,7 @@ const formItems = computed<IFormItem[]>(() => [
     hidden: formData.value.status !== 1,
     props: {
       options: testCascadeOptions,
-    }
+    },
   },
   {
     type: () => h(ElButton, { type: 'primary' }, { default: () => '按钮测试' }),
@@ -122,32 +124,37 @@ const formItems = computed<IFormItem[]>(() => [
     prop: 'submit',
     onClick: () => {
       ElMessage.success('按钮测试')
-    }
-  }
+    },
+  },
 ])
 
 const formBuilderRef = useTemplateRef<typeof FormBuilder>('formBuilderRef')
 
 const onSubmit = () => {
-  formBuilderRef.value?.validate().then(() => {
-    console.log(formData.value)
-  }).catch((e: any) => {
-    console.log('校验失败', e)
-  })
+  formBuilderRef.value
+    ?.validate()
+    .then(() => {
+      console.log(formData.value)
+    })
+    .catch((e: any) => {
+      console.log('校验失败', e)
+    })
 }
 
-
-const { FormBuilder: FormBuilderComposable, validate: validateComposable } = useFormBuilder({
-  formRules,
-  formItems,
-  formData,
-})
-const onSubmitComposable = () => {
-  validateComposable().then(() => {
-    console.log(formData.value)
-  }).catch((e: any) => {
-    console.log('校验失败', e)
+const { FormBuilder: FormBuilderComposable, validate: validateComposable } =
+  useFormBuilder({
+    formRules,
+    formItems,
+    formData,
   })
+const onSubmitComposable = () => {
+  validateComposable()
+    .then(() => {
+      console.log(formData.value)
+    })
+    .catch((e: any) => {
+      console.log('校验失败', e)
+    })
 }
 </script>
 
@@ -155,13 +162,16 @@ const onSubmitComposable = () => {
   <div class="form-container">
     <h1>组件式使用</h1>
     <FormBuilder
-        ref="formBuilderRef"
-        :formRules="formRules"
-        :formItems="formItems"
-        :formData="formData"
+      ref="formBuilderRef"
+      :formRules="formRules"
+      :formItems="formItems"
+      :formData="formData"
     >
       <template #customSlotValue>
-        <el-input v-model="formData.customSlotValue" placeholder="请输入自定义插槽的值" />
+        <el-input
+          v-model="formData.customSlotValue"
+          placeholder="请输入自定义插槽的值"
+        />
       </template>
     </FormBuilder>
     <el-button @click="onSubmit">提交</el-button>
@@ -171,7 +181,10 @@ const onSubmitComposable = () => {
     <h1>组合式函数使用</h1>
     <FormBuilderComposable>
       <template #customSlotValue>
-        <el-input v-model="formData.customSlotValue" placeholder="请输入自定义插槽的值" />
+        <el-input
+          v-model="formData.customSlotValue"
+          placeholder="请输入自定义插槽的值"
+        />
       </template>
     </FormBuilderComposable>
     <el-button @click="onSubmitComposable">提交</el-button>
